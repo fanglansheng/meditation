@@ -1,0 +1,267 @@
+<div ng-controller="createController">
+    <!-- create album -->
+    <div class="modal fade" id="c-album-popup" role="dialog">
+        <div class="modal-dialog">
+
+            <!-- Modal content-->
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal">&times;</button>
+                    <h4 class="modal-title">Create Album:</h4>
+                </div>
+
+                <div class="modal-body">
+                    <form id="create_album_form" method="post" action="." name="{{ create_album_form.form_name }}" enctype="multipart/form-data" novalidate>
+                        <div style="color: red" ng-bind="createAlbumError"></div>
+
+                        {{ create_album_form.name.label_tag }}{{ create_album_form.name }}
+                        {{ create_album_form.image.label_tag }}{{ create_album_form.image }}
+                        {{ create_album_form.description.label_tag }}{{ create_album_form.description }}
+                        {% csrf_token %}
+                    </form>
+
+                    <div id="choose-sound-container">
+                        
+                        <label style="margin-right: 20px">Choose a environment:</label>
+                        <span class="glyphicon glyphicon-search"></span>
+                        <input type="text" ng-model="createAlbumSearch.name" placeholder="Search Environment">
+                        
+                        <div id="choose-sound-list" class="scrollbar-y">
+                            <div class="sound-item" ng-repeat="sound in all_sounds | filter: createAlbumSearch"
+                                 ng-class="{ 'item-active': sound == currentSound }"
+                                 ng-click="setCurrentSound(sound)">
+                                <img class="sound-thumbnail" ng-src="/meditation/get-sound-image/{[{sound.id}]}"/>
+
+                                <p>{[{sound.name}]}</p>
+                            </div>
+                        </div>
+                    </div>
+                    <label>Or create your own sound:</label>
+                    <a data-dismiss="modal" data-toggle="modal" data-target="#c-sound-popup">Create Sound</a>
+                </div>
+
+                <div class="modal-footer">
+                    <button type="button" ng-click="create_album(currentSound)" class="btn btn-default">Create Album
+                    </button>
+                </div>
+
+            </div>
+
+        </div>
+    </div>
+    <!-- create sound -->
+    <div class="modal fade" id="c-sound-popup" role="dialog">
+        <div class="modal-dialog">
+
+            <!-- Modal content-->
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal">&times;</button>
+                    <h4 class="modal-title">Create Environment:</h4>
+                </div>
+
+                <div class="modal-body">
+                    <form id="create_sound_form" method="post" action="."
+                          name="{{ create_sound_form.form_name }}" enctype="multipart/form-data">
+                        <div style="color: red" ng-bind="createSoundError"></div>
+                        {{ create_sound_form.name.label_tag }}{{ create_sound_form.name }}
+                        {{ create_sound_form.image.label_tag }}{{ create_sound_form.image }}
+
+                        <label>Video:</label>
+
+                        <div class="panel-group" id="sound-form-video">
+                            <div class="panel panel-default">
+                                <div class="panel-heading">
+                                    <a data-toggle="collapse" data-parent="#sound-form-video" href="#collapse1">
+                                        Upload from computer</a>
+                                </div>
+                                <div id="collapse1" class="panel-collapse collapse">
+                                    {{ create_sound_form.content }}
+                                </div>
+                            </div>
+                            <div class="panel panel-default">
+                                <div class="panel-heading">
+                                    <a data-toggle="collapse" data-parent="#sound-form-video" href="#collapse2">
+                                        Get from Youtube</a>
+                                </div>
+                                <div id="collapse2" class="panel-collapse collapse">
+                                    {{ create_sound_form.url }}
+                                </div>
+                            </div>
+                        </div>
+
+                        {% csrf_token %}
+                    </form>
+                </div>
+
+                <div class="modal-footer">
+                    <button type="button" ng-click="create_sound()" class="btn btn-default">Create
+                        Sound</button>
+                </div>
+
+            </div>
+        </div>
+
+    </div>
+
+    <!-- create music -->
+    <div class="modal fade" id="c-music-popup" role="dialog">
+        <div class="modal-dialog">
+
+            <!-- Modal content-->
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal">&times;</button>
+                    <h4 class="modal-title">Pin from YouTube :</h4>
+                </div>
+
+                <div class="modal-body">
+                    <form id="create_music_form" method="post" action="{% url 'create_music' %}"
+                          name="{{ create_music_form.form_name }}">
+                        <div style="color: red" ng-bind="createMusicError"></div>
+                        {{ create_music_form.name.label_tag }}{{ create_music_form.name }}
+                        {{ create_music_form.url.label_tag }}{{ create_music_form.url }}
+                        {% csrf_token %}
+                    </form>
+                    
+                    <label>Choose a album:</label>
+                    <div>
+                        <span class="glyphicon glyphicon-search"></span>
+                        <input type="text" ng-model="createMusicAlbumSearch.name" placeholder="Search Album">
+                    </div>
+                    <div ng-repeat="album in user_albums | filter:createMusicAlbumSearch">
+                      <input type="checkbox" ng-model="album.added" ng-checked="checkMusicInAlbum(album)">
+                      <span>{[{album.name}]}</span>
+                    </div>
+                    <div ng-if="user_albums.length == 0">
+                        <label>You don't have any album yet! Go create One!!</label>
+                        <a data-dismiss="modal" data-toggle="modal" data-target="#c-album-popup">Create Album</a>
+                    </div>
+                    <label ng-show="!notEmptyList">You must choose an album!</label>
+                </div>
+
+                <div class="modal-footer">
+                    <button type="button" ng-click="create_music()" class="btn btn-default">Finish</button>
+                </div>
+
+            </div>
+        </div>
+    </div>
+
+</div>
+
+<div ng-controller="authController">
+
+    <!-- login -->
+    <div class="modal fade" id="login-popup" role="dialog">
+        <div class="modal-dialog">
+            <!-- Modal content-->
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal">&times;</button>
+                    <h4 class="modal-title">Welcome! Please Login.</h4>
+                </div>
+                <div class="modal-body" id="login-form">
+                    <form id="loginForm" method="post" action="{% url 'login' %}" name="login-form">
+                        <div style="color: red" ng-bind="loginError"></div>
+                        {{ login_form }}
+                        {% csrf_token %}
+                        <input type="hidden" name="next" value="{{ next }}"/>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" data-toggle="modal"
+                            data-target="#email-reset-password-popup"
+                            onclick="$('#login-popup').modal('hide')" class="btn btn-default">Forgot password
+                    </button>
+                    <button type="button" ng-click="login()" class="btn btn-success">Login</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- register -->
+    <div class="modal fade" id="register-popup" role="dialog">
+        <div class="modal-dialog">
+            <!-- Modal content-->
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal">&times;</button>
+                    <h4 class="modal-title">Please fill in the blanks to complete registration.</h4>
+                </div>
+                <div class="modal-body" id="register-form">
+                    <form id="registerForm" method="post" action="{% url 'register' %}">
+                        <div style="color: red" ng-bind="registerError"></div>
+                        {{ register_form }}
+                        {% csrf_token %}
+                        <input type="hidden" name="next" value="{{ next }}"/>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" ng-click="register()" class="btn btn-default">Register</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- reset password -->
+    <div class="modal fade" id="email-reset-password-popup" role="dialog">
+        <div class="modal-dialog">
+            <!-- Modal content-->
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal">&times;</button>
+                    <h4 class="modal-title">Enter your username below to send reset password through email.</h4>
+                </div>
+                <div class="modal-body" id="reset-password-form">
+                    <form id="resetPasswordForm" method="post" action="{% url 'reset_password_email' %}" name="{{ reset_password_form.form_name }}">
+                        <div style="color: red" ng-bind="resetPasswordError"></div>
+                        {{ reset_password_form }}
+                        {% csrf_token %}
+                        <input type="hidden" name="next" value="{{ next }}"/>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <a class="btn btn-default" data-toggle="modal" data-target="#login-popup"
+                       ng-click="backToLogin()">Back</a>
+                    <button type="button" ng-click="reset_password()" class="btn btn-default">Send Email</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+</div>
+
+
+<div ng-controller="helpController" class="modal fade" id="help-popup" role="dialog">
+    <div class="modal-dialog">
+        <!-- Modal content-->
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal">&times;</button>
+                <h4 class="modal-title">FAQ:</h4>
+            </div>
+
+            <div class="modal-body">
+                <div>
+                    <span class="glyphicon glyphicon-search"></span>
+                    <input class="search-bar"  type="text" ng-model="faqSearch" placeholder="Search Question">
+                </div>
+                <div id="faq-list" class="scrollbar-y">
+                    <div ng-repeat="faq in faqs | filter: faqSearch">
+                        <hr>
+                        <div>{[{ faq.id }]}. {[{ faq.question }]}</div>
+                        <div>{[{ faq.answer }]}</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="modal-footer">
+                <button type="button" ng-click="download()" class="btn btn-danger">Download Extension</button>
+                <button type="button" data-dismiss="modal" class="btn btn-default">Close</button>
+            </div>
+
+        </div>
+    </div>
+</div>
+

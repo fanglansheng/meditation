@@ -1,0 +1,105 @@
+
+<!-- Album Side Bar Division -->
+<div class="container" id="album-sidebar">
+
+  <!-- sidebar control button to show and hid this div -->
+  <button id="albums-sideCtrl-btn" ng-click="showSidebar()">
+    Albums <span ng-class="ctrlBtnIcon"></span>
+  </button>
+
+  <!-- Show the nav bar of album and sound -->
+  <div class="container-nav col-sm-2">
+    <p style="font-size: 18px;font-weight: 700">My Environment:</p>
+    <div class="sound-item" style="cursor: default;">
+      <img class="sound-thumbnail" ng-src="/meditation/get-sound-image/{[{currentSound.id}]}"/>
+      <p>{[{currentSound.name}]}</p>
+      <button class="btn btn-primary" data-toggle="modal" data-target="#environment-popup">Change Environment</button>
+    </div>
+  </div>
+
+  <!-- show the album and sound list -->
+  <div class="container-list col-sm-5">
+    <!-- album list -->
+    <div style="margin: 5px;">
+      <span class="glyphicon glyphicon-search"></span>
+      <input class="search-bar"  type="text" ng-model="searchSidebarAlbum.name" placeholder="Search Album by Name">
+    </div>
+    <div class="album-list">
+      <div class="album-item" ng-repeat="album in $parent.albumList | filter: searchSidebarAlbum | orderBy:'-favorite'"
+      ng-class="{ 'item-active': album.id == currentAlbum.id }">
+        <div class="album-face">
+          <img class="album-thumbnail" ng-src="/meditation/get-album-image/{[{album.id}]}"/>
+          <div class="album-control-bar">
+            <a ng-click="playAlbum(album)"><span class="glyphicon glyphicon-play"></span></a>
+          </div>
+        </div>
+      
+        <div class="album-content">
+          <p class="album-title">{[{album.name}]}</p>
+          <p><a ng-if="currentUser" href="/meditation/user-profile/{[{album.user.id}]}">{[{album.user.username}]}</a></p>
+          <p ng-if="currentUser==undefined">{[{album.user.username}]}</p>
+          <p>{[{album.description}]}</p>
+        </div>
+
+        <p class="album-action">
+          <a active-tooltip ng-if="currentUser==undefined" data-toggle="tooltip" title="Login to favorite it!" ng-click="favorite(album)"><span class="glyphicon glyphicon-heart" ng-class="{'favorite-active':checkFavorite(album)}"></span></a>
+
+          <span ng-if="currentUser">
+              <a ng-if="checkFavorite(album)" active-tooltip class="favorite-active" ng-click="unfavorite(album)" data-toggle="tooltip" title="Unfavorite!" data-placement="left"><span class="glyphicon glyphicon-heart"></span></a>
+
+              <a ng-if="!checkFavorite(album)" active-tooltip ng-click="favorite(album)" data-toggle="tooltip" title="Add to favorite!" data-placement="left"><span class="glyphicon glyphicon-heart"></span></a>
+          </span>
+          
+          {[{album.favorite}]}
+        </p>
+
+      </div>
+
+    </div>
+  </div>
+
+  <!-- show the music list -->
+  <div class="container-music col-sm-5">
+    
+    <h3>{[{$parent.currentAlbum.name}]}'s Musics</h3>
+    <!-- control tool bar -->
+    <div>
+      <a ng-click="pauseMusic()"><span ng-class="pauseIcon"></span></a>
+      <a ng-click="playNextMusic()"><span class="glyphicon glyphicon-step-forward"></span></a>
+    </div>
+
+    <div id="list-music">
+      <!-- each music item -->
+
+        <table class="table col-sm-12">
+            <tr ng-repeat="music in $parent.currentAlbum.musics" ng-class="{ 'music-active': music == currentMusic }"><!-- currentAlbum.musics -->
+                <div class="music-item">
+                    <td ng-if="currentUser"><a ng-click="showAddtoPopover(music)" class="add-btn"></a></td>
+                    <td ng-click="playMusic(music)" class="pointer" >{[{ music.name }]}</td>
+                </div>
+            </tr>
+        </table>
+
+      <!-- </div> -->
+      <div id="music-video"></div>
+    </div>
+  </div>
+
+</div>
+
+<!-- add music popup -->
+<div ng-if="currentUser" id="music-popover" class="pop-over">
+  <div class="pop-over-title">
+    <h3>Add to:</h3>
+    <span class="glyphicon glyphicon-search"></span>
+    <input type="text" ng-model="searchAlbumText.name" placeholder="Search Album">
+  </div>
+  <div class="pop-over-containt">
+    <div ng-repeat="album in $parent.user_albums | filter:searchAlbumText">
+      <input type="checkbox" ng-model="album.selected" ng-change="changeMusicInAlbum(album, selectedMusic)"
+      ng-checked="checkMusicInAlbum(album,selectedMusic)">
+      <span>{[{album.name}]}</span>
+    </div>
+  </div>
+</div>
+

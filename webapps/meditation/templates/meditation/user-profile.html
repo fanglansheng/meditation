@@ -1,0 +1,268 @@
+{% extends "meditation/base.html" %}
+{% block content %}
+<div meditation-navbar></div>
+
+<div ng-controller="albumController" ng-init="isProfile = true" style="height:100%">
+    <!-- information status -->
+    <div id="status-bar" ng-bind="status"></div>
+
+    <!-- main profile -->
+    <div class="col-sm-8" ng-controller="profileController" style="height:100%">
+
+        <!-- personal information -->
+        <div class="profile-info-container">
+
+            <!-- decide to show logging user image or other user's image -->
+            <div ng-if="otherUser.id == currentUser.id">
+                <img ng-src="{[{ image.imgSrc }]}" alt="{[{ user_id }]}" class="profile-img"/>
+            </div>
+            <div ng-if="otherUser.id != currentUser.id">
+                <img ng-src="{[{ imgSrc }]}" alt="{[{ otherUser.id }]}" class="profile-img"/>
+            </div>
+
+            <div class="profile-info">
+                <h4>USER:  {[{otherUser.username}]}</h4>
+                <h3 class="profile-name">{[{profile.last_name}]} {[{profile.first_name}]}</h3>
+                <p>About me: {[{profile.bio}]}</p>
+            </div>
+            <div style="float:right" ng-if="otherUser.id == currentUser.id">
+                <button class="btn btn-default" data-toggle="modal" data-target="#change-profile-popup"><span class="glyphicon glyphicon-cog"></span> Edit Profile  </button>
+
+                <button class="btn btn-default" data-toggle="modal" data-target="#change-password-popup"><span class="glyphicon glyphicon-lock"></span> New Password</button>
+            </div>
+        </div>
+
+        <!-- albums and sounds -->
+        <div class="profile-body-container" style="height:100%">
+            <!-- nav bar -->
+            <ul class="nav nav-tabs">
+                <li class="active"><a data-toggle="tab" href="#profile-sounds">Environments</a></li>
+                <li><a data-toggle="tab" href="#profile-favoriates">Favorites</a></li>
+                <li><a data-toggle="tab" href="#profile-albums">Albums</a></li>
+            </ul>
+            
+            <div class="tab-content" style="height:65%">
+
+                <!-- user's sounds -->
+                <div id="profile-sounds" class="tab-pane fade in active" style="height:100%">
+                    <div class="scrollbar-y-2">
+                        <div class="sound-item" ng-repeat="sound in $parent.profileSounds">
+                            <img class="sound-thumbnail" ng-src="/meditation/get-sound-image/{[{sound.id}]}" alt="{[{ sound.name }]}"/>
+                            <h3>{[{ sound.name }]}</h3>
+                            <a ng-if="otherUser.id == currentUser.id" class="delete-btn" ng-click="delete_unused_sound(sound)"></a>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- user's albums -->
+                <div id="profile-albums" class="tab-pane fade" style="height:100%">
+                    <div class="scrollbar-y-2">
+                        <div ng-repeat="album in $parent.profileAlbums">
+
+                            <div class="album-item">
+                                <div class="album-face">
+                                    <img class="profile-album-thumbnail" ng-src="/meditation/get-album-image/{[{album.id}]}" alt="{[{ album.name }]}"/>
+                                    <div class="album-control-bar pointer">
+                                        <a ng-click="playAlbumWithSound(album)"><span class="glyphicon glyphicon-play"></span></a>
+                                    </div>
+                                </div>
+
+                                <div class="album-content">
+                                    <p class="album-title">{[{ album.name }]} / Environment: {[{album.sound.name}]}</p>
+                                    <p> <a href="/meditation/user-profile/{[{album.user.id}]}">{[{album.user.username}]}</a></p>
+                                    <p>{[{album.description}]}</p>
+                                </div>
+
+                                <div class="album-action">
+                                    <p>
+                                        <a ng-if="checkFavorite(album)" active-tooltip class="favorite-active" ng-click="unfavorite(album)" data-toggle="tooltip" title="Unfavorite!" data-placement="left"><span class="glyphicon glyphicon-heart"></span></a>
+
+                                        <a ng-if="!checkFavorite(album)" active-tooltip ng-click="favorite(album)" data-toggle="tooltip" title="Add to favorite!" data-placement="left"><span class="glyphicon glyphicon-heart"></span></a>
+                                        {[{album.favorite}]}
+                                        <a class="pointer" ng-if="otherUser.id == currentUser.id" ng-click="delete_user_album(album)">Delete</a>
+                                    </p>
+                                </div>
+                                <p><a class="profile-comment pointer" ng-click="album.showComment=!album.showComment" ng-init="album.showComment=false" >COMMENTS</a></p>
+                            </div>
+                            <!-- comments for current album -->
+                            <div ng-if="album.showComment" class="comment-container">
+                                <form class="comment-form">
+                                    <span>{[{currentUser.username}]}: </span>
+                                    <input class="comment-bar" type="text" ng-model="newComment" name="comment-content">
+                                    <button class="btn btn-default" type="button" ng-click="add_comment(album,newComment)">Add Comment</button>
+                                </form>
+                                <div class="comment-item" ng-repeat="comment in album.comment">
+                                    <span>{[{ comment.user.username }]}: {[{ comment.content }]}</span>
+                                    <a ng-if="comment.user.id == currentUser.id" class="delete-btn" ng-click="delete_comment(album, comment)"></a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- user's favorite -->
+                <div id="profile-favoriates" class="tab-pane fade" style="height:100%">
+                    <div class="scrollbar-y-2">
+                        <div ng-repeat="album in $parent.profileFavorites | orderBy:'-favorite'">
+                            <div class="album-item">
+                                <div class="album-face">
+                                    <img class="profile-album-thumbnail"
+                                         ng-src="/meditation/get-album-image/{[{album.id}]}" alt="{[{ album.name }]}"/>
+
+                                    <div class="album-control-bar pointer">
+                                        <a ng-click="playAlbumWithSound(album)"><span
+                                                class="glyphicon glyphicon-play"></span></a>
+                                    </div>
+                                </div>
+
+                                <div class="album-content">
+                                    <p class="album-title">{[{ album.name }]} / Environment: {[{album.sound.name}]}</p>
+
+                                    <p>
+                                        <a href="/meditation/user-profile/{[{album.user.id}]}">{[{album.user.username}]}</a>
+                                    </p>
+
+                                    <p>{[{album.description}]}</p>
+                                </div>
+
+                                <p class="album-action">
+                                    <a active-tooltip ng-if="otherUser.id == currentUser.id" class="favorite-active"
+                                       ng-click="unfavorite(album)" data-toggle="tooltip" title="Unfavorite!"
+                                       data-placement="left"><span class="glyphicon glyphicon-heart">  </span></a>
+
+                                <span ng-if="otherUser.id != currentUser.id">
+                                    <a ng-if="checkFavorite(album)" active-tooltip class="favorite-active"
+                                       ng-click="unfavorite(album)" data-toggle="tooltip" title="Unfavorite!"
+                                       data-placement="left"><span class="glyphicon glyphicon-heart"></span></a>
+
+                                    <a ng-if="!checkFavorite(album)" active-tooltip ng-click="favorite(album)"
+                                       data-toggle="tooltip" title="Add to favorite!" data-placement="left"><span
+                                            class="glyphicon glyphicon-heart"></span></a>
+                                </span>
+
+                                    {[{album.favorite}]}
+                                </p>
+
+                                <p><a class="profile-comment pointer" ng-click="album.showComment=!album.showComment" ng-init="album.showComment=false">COMMENTS</a></p>
+                            </div>
+                            <div ng-if="album.showComment" class="comment-container">
+                                <form class="comment-form">
+                                    <span>{[{currentUser.username}]}: </span>
+                                    <input class="" type="text" ng-model="newComment" name="comment-content">
+                                    <button class="btn btn-default" type="button"
+                                            ng-click="add_comment(album,newComment)">
+                                        Add Comment
+                                    </button>
+                                </form>
+                                <div class="comment-item" ng-repeat="comment in album.comment">
+                                    <span>{[{ comment.user.username }]}: {[{ comment.content }]}</span>
+                                    <a ng-if="comment.user.id == currentUser.id" class="delete-btn" ng-click="delete_comment(album, comment)"></a>
+                                </div>
+                            </div>
+                        </div>
+                        <!-- comments for current album -->
+
+                    </div>
+                </div>
+
+            </div>
+        </div>
+
+        <!-- change profile -->
+    
+        <div class="modal fade" id="change-profile-popup" role="dialog">
+            <div class="modal-dialog">
+                <!-- Modal content-->
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <button type="button" class="close" data-dismiss="modal">&times;</button>
+                        <h1 class="modal-title">Change my profile:</h1>
+                    </div>
+                    <div class="modal-body">
+                        <form id="profile_form" method="post" name="{{ profile_form.form_name }}" enctype="multipart/form-data" novalidate>
+                            <div style="color: red" ng-bind="editProfileError"></div>
+                            {{profile_form.first_name.label_tag}}{{profile_form.first_name}}
+                            {{profile_form.last_name.label_tag}}{{profile_form.last_name}}
+                            {{profile_form.bio.label_tag}}{{profile_form.bio}}
+                            {{profile_form.image.label_tag}}{{profile_form.image}}
+                        </form>
+                    </div>
+                    <div class="modal-footer">
+                        <button class="btn btn-default" type="button" name="save" ng-click="save_edit_profile()">Save</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- change password -->
+        <div class="modal fade" id="change-password-popup" role="dialog">
+            <div class="modal-dialog">
+
+                <!-- Modal content-->
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <button type="button" class="close" data-dismiss="modal">&times;</button>
+                        <h1 class="modal-title">Change Password:</h1>
+                    </div>
+
+                    <div class="modal-body">
+                        <form id="change_password_form_inner" name="change_password_form" novalidate>
+                            <div style="color: red" ng-bind="changePasswordError"></div>
+                            <label>Old Password:</label>
+                            <input type="password" name="oldPassword" placeholder="Old Password" ng-model="oldPassword" class="form-control">
+                            <label>New Password:</label>
+                            <input type="password" name="newPassword1" placeholder="New Password" ng-model="newPassword1" class="form-control">
+                            <label>Confirm New Password:</label>
+                            <input type="password" name="newPassword2" placeholder="Confirm Password" ng-model="newPassword2" class="form-control">
+                        </form>
+                    </div>
+
+                    <div class="modal-footer">
+                        <button class="btn btn-default" type="button" name="submitChangePwd" ng-click="changePassword()">Submit</button>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <!-- music sidebar -->
+    <div class="col-sm-4 profile-music-container">
+        <!--musics for this album-->
+
+        <img class="profile-album-thumbnail" ng-src="/meditation/get-album-image/{[{currentAlbum.id}]}" alt="{[{ currentAlbum.name }]}"/>
+        <div class="album-content">
+            <p>Album: {[{currentAlbum.name}]}</p>
+            <p>Environment: {[{currentAlbum.sound.name}]}</p>
+            <a class="pointer" ng-click="pauseSound()">Mute Environment
+            <span ng-class="soundMuteIcon"></span>
+            </a>
+        </div>
+
+        <h4>Musics:
+            <a ng-click="pauseMusic()"><span ng-class="pauseIcon"></span></a>
+            <a ng-click="playNextMusic()"><span class="glyphicon glyphicon-step-forward"></span></a>
+        </h4>
+        <div class="profile-music-scroll">
+            <table id="music-panel" class="table">
+                <tr ng-repeat="music in $parent.currentAlbum.musics" ng-class="{ 'music-active': music == currentMusic }">
+                    <td>{[{ $index + 1 }]}</td>
+                    <td class="pointer" ng-click="playMusic(music)">{[{ music.name }]}</td>
+                    <td><a ng-if="$parent.currentAlbum.user.id == $parent.currentUser.id" class="delete-btn" ng-click="delete_music_in_album($parent.currentAlbum, music)"></a></td>
+                </tr>
+            </table>
+        </div>
+
+        <div id="youtube-video"></div>
+        <video ng-hide="currentSound.url!=''" autoplay loop>
+            <source id="user-video">
+        </video>
+        <div id="music-video"></div>
+    </div>
+
+</div>
+
+{% include "meditation/popup-create-album.html" %}
+{% endblock %}
+

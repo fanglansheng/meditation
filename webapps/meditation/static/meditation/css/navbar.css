@@ -1,0 +1,56 @@
+/**********************
+        MIXINS
+***********************/
+.navbar li a {
+  margin: 8px;
+  padding: 5px 24px;
+  font-size: 20px;
+  font-family: 'Yanone Kaffeesatz', sans-serif;
+  color: #555;
+  border: 2px solid white;
+}
+.navbar li a:hover {
+  color: #4dcaac;
+  border: #4dcaac 2px solid;
+  background-color: white;
+}
+.navbar li a:active {
+  color: red;
+}
+.navbar .nav-image {
+  padding: 0px;
+}
+.navbar .nav-dropdown {
+  padding: 5px 5px;
+  margin-left: 0px;
+  margin-right: 30px;
+}
+.navbar-brand {
+  color: #555;
+  font-family: 'Yanone Kaffeesatz', sans-serif;
+  font-size: 26px;
+  line-height: 30px;
+}
+.navbar-brand:hover {
+  color: #4dcaac;
+}
+.navbar {
+  margin: 2px;
+  min-height: 62px;
+  border-radius: 0 0 4px;
+}
+.navbar-nav > li > a {
+  line-height: 30px;
+}
+.p-img-s {
+  width: 40px;
+  height: 40px;
+  border-radius: 2px;
+  border: 1px solid white;
+}
+.modal-dialog {
+  margin: 100px auto;
+}
+.active {
+  background-color: #4dcaac;
+}

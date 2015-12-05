@@ -1,0 +1,614 @@
+@import "navbar.less";
+/**********************
+       CONSTANTS
+***********************/
+
+@defaultContainerWidth: 100%;
+@listItemWidth: 140px;
+@listItemHeight: 200px;
+@albumWidthBig: @listItemWidth - 10px;
+@albumWidthMid: 60px;
+@albumWidthSmall: 30px;
+@albumMargin: 10px;
+
+@profileImgBig: 100px;
+
+@btnWidth: 25px;
+@btnHeight: 50px;
+
+@lightGreen: #00FFCC;
+
+@scenePadding : 0px;
+@sceneHeight : 600;
+
+@itemBgCol: #fffcf5;
+/*********************************
+   OPERATIONS & COLOR FUNCTIONS
+**********************************/
+
+//@darkBlue: @lightBlue - #555;
+ 
+//@defaultThemeColor:@lightBlue;
+//@defaultThemeColor:spin(@lightBlue, 100);
+ 
+//@borderSize:@defaultShapesWidth * 0.1;
+//@borderColor:@defaultThemeColor - #222; 
+//@borderColor:darken(desaturate(@defaultThemeColor, 100%), 20%); 
+ 
+ 
+/**********************
+        MIXINS
+***********************/
+.Btn(@w:@btnWidth, @h:@btnHeight){
+    z-index: 2;
+    width: @w;
+    height: @h;
+    position: absolute;
+    outline: none;
+}
+
+.Popup(){
+    position: absolute;
+    top: 25%;
+    left: 25%;
+    width: 50%;
+    height: 50%;
+    padding: 16px;
+    border: 3px solid white;
+    background-color: rgba(255,255,255,0.5);
+    z-index:1002;
+    overflow: auto;
+}
+ 
+/**********************
+         STYLES
+***********************/
+html { height:100%; }
+
+body{
+    height: 100%;
+    overflow: hidden;
+    font-family: 'Abel', sans-serif;
+    // font-family: 'Open Sans Condensed', sans-serif;
+}
+
+p, a{font-size: 15px; margin:0px;}
+
+h1{
+    font-size: 26px;
+}
+
+h3{
+    margin: 5px 0;
+    font-size: 20px;
+    font-weight: 700;
+}
+
+h4{
+    font-size: 16px;
+    font-weight: 700;
+    margin: 8px 0px;
+}
+
+// form title
+label{
+    font-size: 16px;
+    margin: 5px 0;
+}
+
+.pointer{
+    cursor: pointer;
+}
+.container{
+    //display:inline-block;
+    width: @defaultContainerWidth;
+    text-align: center;
+    position:relative;
+    padding:0;
+}
+
+.scene{
+    background-color:black;
+    padding: @scenePadding;
+    height: @sceneHeight;
+}
+
+#scene-canvas{
+    position: absolute;
+    top: @scenePadding;
+    left: 0;
+    right: 0;
+}
+
+
+#album-sidebar{
+    position:absolute;
+    bottom:-240px;
+}
+
+.pre-btn{
+    .Btn;
+    left: 0px;
+    top: 80px;
+    background: url('../res/btns.png') 25px 0;
+    &:hover{
+        background: url('../res/btns.png') 25px 50px;
+    }
+}
+
+.next-btn{
+    .Btn;
+    right: 0px;
+    top: 80px;
+    background: url('../res/btns.png') 0 0;
+    &:hover{
+        background: url('../res/btns.png') 0px 50px;
+    }
+}
+
+#launch-btn{
+    width: 80px;
+    height: 80px;
+    border-radius: 40px;
+    background: salmon;
+    border: 5px solid white;
+    position: absolute;
+    left: 0px;
+    right: 0px;
+    margin: auto;
+    bottom: -40px;
+    color: white;
+    &:hover{
+        background: #F69E93;
+    }
+    &:disabled{
+        background-color: darkgrey;
+    }
+}
+
+.add-btn{
+    .Btn(25px, 25px);
+    left:15px;
+    background: url('../res/add.png');
+    background-size: 25px;
+    &:hover{
+        background: url('../res/add.png') 0px 25px;
+        background-size: 25px;
+    }
+}
+
+.delete-btn{
+    .Btn(20px, 20px);
+    right:15px;
+    background: url('../res/delete2.png');
+    background-size: 20px;
+    cursor: pointer;
+    &:hover{
+        
+    }
+}
+
+#stream-music-list{
+    width: 200px;
+    height: 550px;
+    background-color: rgba(255,255,255,0.5);
+    position: absolute;
+    right:0;
+    top:0;
+}
+
+.popup-title{
+    padding: 10px;
+}
+
+// .popover.left{
+//     margin-left: -20px;
+//     margin-top: 60px;
+// }
+
+// .popover.left>.arrow{
+//     margin-top: -70px;
+// }
+
+
+#album-panel{
+    margin-left: 30px;
+}
+#music-panel{
+    margin-right: 30px;
+    position: relative;
+}
+.profile-music-scroll{
+    // height: 500px;
+    height: 73%;
+    overflow: scroll;
+}
+/*********************************
+    Sidebar Parts
+**********************************/
+
+#albums-sideCtrl-btn{
+    display: block;
+    color: white;
+    width: 150px;
+    height: 50px;
+    background: cornflowerblue;
+    margin: auto;
+    border: 3px solid;
+    border-bottom: 0;
+    border-radius: 5px 5px 0px 0px;
+    &:hover{
+        background: aquamarine;
+    }
+}
+
+//******* containers *******
+.container-nav, .container-music, .container-list{
+    padding:0px;
+    background:rgba(255,255,255,0.9);
+}
+
+// sidebar nav bar
+.container-nav ul{
+    margin: 0;
+    padding: 0px;
+}
+
+.container-nav ul li{
+    list-style-type: none;
+    padding: 15px 0;
+    width:100%;
+    font-size: 20px;
+    font-weight: 700;
+    // background-color: beige;
+    &:hover{
+        background-color: @activeGreenCol;
+        color: white;
+    }
+
+}
+
+// sidebar album and sound list
+.album-list{
+    overflow:scroll;
+    height:200px;
+    background: white;
+    text-align: left;
+}
+
+.sound-thumbnail{
+    margin-top:5px;
+    width: @albumWidthBig;
+    height: @albumWidthBig;
+}
+
+.album-thumbnail{
+    width: @albumWidthMid;
+    height: @albumWidthMid;
+}
+
+.album-thumbnail-small{
+    margin-top:5px;
+    width: 80px;
+    height: 80px;
+}
+
+
+.album-thumbnail:hover + .album-play {
+    opacity: 1;
+}
+
+.album-play{
+    width: @albumWidthMid;
+    height: @albumWidthMid;
+    position:absolute;
+    top: 50px;
+    left:50px;
+    opacity: 0;
+
+    &:hover{
+        opacity: 1;
+    }
+
+}
+
+.sound-item{
+    width: @listItemWidth;
+    height: @listItemHeight;
+    text-align: center;
+    background-color: @itemBgCol;
+    float: left;
+    margin: @albumMargin;
+    position:relative;
+    border-radius: 3px;
+    border-bottom: 4px solid @greenBorderCol;
+
+    // &:hover{
+    //     background-color: aquamarine;
+    // }
+}
+
+.album-item{
+    border-bottom: 4px solid lightpink;
+    border-top: 1px solid rgb(231, 243, 231);
+    border-left: 1px solid rgb(231, 243, 231);
+    border-right: 1px solid rgb(231, 243, 231);
+    background: rgb(245,255,250);
+    border-radius: 3px;
+    position: relative;
+    font-size: 24px;
+    margin: 10px;
+    padding: 10px;
+}
+
+.album-face{
+    display: inline-block;
+    // margin: 5px;
+    position: relative;
+}
+// the text content of album item
+.album-content{
+    position: absolute;
+    left: 80px;
+    top: 5px;
+}
+// the name of album
+.album-title{
+    font-weight: 600;
+    font-size: 18px;
+}
+.album-action{
+    float:right;
+    // top: 40px;
+    // position: relative;
+}
+
+.album-play2{
+    width: @albumWidthSmall;
+    height: @albumWidthSmall;
+    position:relative;
+}
+
+.album-control-bar{
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    background: rgba(0, 185, 110, 0.5);
+    width: @albumWidthMid;
+    height: @albumWidthMid;
+    text-align: center;
+    opacity: 0;
+    &:hover{
+        opacity: 1;
+    }
+}
+
+
+.album-control-bar a{
+    color:@itemBgCol;
+    position: relative;
+    padding: 5px;
+    font-size: 28px;
+    top: 13px;
+    text-shadow: 1px 1px 3px #000000;
+
+    &:hover{
+        color:#ff8080;
+    }
+}
+
+
+.environment-thumbnail{
+    width: 100px;
+    height: 100px;
+}
+
+.item-active{
+    background-color: #ccfff5;
+    border-bottom: 4px solid #00b38f;
+}
+
+.music-active{
+    background-color: #ccfff5;
+}
+/////// music list
+.music-item{
+    &:hover{
+        background-color: #00ffcc;
+    }
+}
+#list-music{
+    overflow: scroll;
+    height: 180px;
+}
+
+
+
+//popup
+.pop-over{
+    position: absolute;
+    bottom: 10px;
+    right: 250px;
+    width: 200px;
+    padding: 16px;
+    border: 1px solid gainsboro;
+    border-radius: 3px;
+    background-color: white;
+    z-index: 1002;
+    opacity:0;
+    display:none;
+}
+
+#search-album{
+    width:80%;
+    margin-left: 10px;
+}
+
+#choose-sound-container{
+    overflow-y: scroll;
+}
+
+#choose-sound-list{
+    // overflow:hidden;
+    background-color: rgba(255,255,255,0.5);
+    // width: 100000px;
+    padding:10px;
+}
+
+.manage-panel{
+    margin: 10px;
+}
+
+.panel-heading{
+    background-color: aquamarine;
+}
+
+.panel-body{
+    background: cadetblue;
+    border: 1px solid gainsboro;
+    border-top: 0px;
+}
+
+.btn-right{
+    padding: 5px 10px;
+    float: right;
+    border: 1px solid;
+    background-color: white;
+    border-radius: 2px;
+    &:hover{
+        background-color: ivory;
+    }
+}
+
+.scrollbar-x{
+    overflow-x: scroll;
+    width: 100%;
+}
+.scrollbar-y{
+    overflow-y: scroll;
+    height: 200px;
+}
+
+.scrollbar-y-2{
+    overflow-y: scroll;
+    // height: 450px;
+    height: 98%;
+}
+
+.scrollbar-y-2-1{
+    overflow-y: scroll;
+    height: 400px;
+    width: 180px;
+}
+
+
+.profile-img{
+    width: @profileImgBig;
+    height: @profileImgBig;
+    border-radius: 3px;
+    float: left;
+}
+
+.profile-name{
+    font-size: 36px;
+}
+
+.profile-info-container{
+    height: 100px;
+    padding: 0 10px;
+}
+.profile-body-container{
+    padding: 10px;
+}
+
+.profile-music-container{
+    padding: 10px;
+    height: 100%;
+    background-color: aliceblue;
+}
+.profile-info{
+    float: left;
+    position: relative;
+    left: 20px;
+}
+
+.comment-container{
+    background-color:#F0F8FF;
+    position: relative;
+    padding: 10px;
+}
+
+.env-sound-list{
+    overflow-y: scroll;
+    height: 260px;
+    margin-bottom: 20px;
+}
+
+.profile-album-item{
+    background-color: white;
+    border-bottom: 2px solid cornflowerblue;
+    position:relative;
+    font-size: 24px;
+}
+
+.profile-album-hover{
+    background: rgba(0, 185, 110, 0.5);
+    width: @albumWidthMid;
+    height: @albumWidthMid;
+    position:absolute;
+    top:0;
+    opacity: 0;
+    &:hover{
+        opacity: 1;
+    }
+}
+
+.profile-album-thumbnail{
+    width: @albumWidthMid;
+    height: @albumWidthMid;
+}
+
+.profile-comment{
+    position: absolute;
+    right: 10px;
+    bottom: 10px;
+}
+
+.profile-like{
+    position: absolute;
+    right: 10px;
+    top: 10px;
+}
+
+.comment-item{
+    border-top: 1px solid;
+    border-color: darkturquoise;
+    padding: 10px;
+}
+
+.comment-form{
+    padding: 10px;
+}
+
+.favorite-active{
+    color: #ff0066;
+    cursor:pointer;
+}
+
+.search-bar{
+    width: 90%;
+}
+.comment-bar{
+    width: 80%;
+    margin: 0 5px;
+}
+#status-bar{
+    position: absolute;
+    top: 50px;
+    z-index: 1000;
+    margin: 0 25%;
+    width: 50%;
+}
+
+

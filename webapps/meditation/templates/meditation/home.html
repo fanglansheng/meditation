@@ -1,0 +1,58 @@
+{% extends "meditation/base.html" %}
+{% block content %}
+
+<div id="status-bar" ng-bind="status"></div>
+<div meditation-navbar></div>
+
+
+<div ng-controller="albumController">
+  
+  <!-- set environment popup -->
+  <div class="modal fade" id="environment-popup" role="dialog" data-backdrop="static">
+    <div class="modal-dialog">
+      <div class="modal-content environment-modal">
+        <div class="modal-header">
+          <button ng-if="!firstSetEnviron" type="button" class="close" data-dismiss="modal">&times;</button>
+          <h1 class="modal-title">SET MY ENVIRONMENT</h1>
+        </div>
+
+        <div class="modal-body">
+          <span class="glyphicon glyphicon-search"></span>
+          <input class="search-bar" type="text" ng-model="searchEnvironment.name" placeholder="Search Environment by Name">
+          <div class="env-sound-list">
+            <div class="sound-item pointer" ng-repeat="sound in all_sounds | filter: searchEnvironment" ng-click="setCurrentSound(sound)" ng-class="{ 'item-active': sound.id == currentSound.id }">
+              <img class="sound-thumbnail" ng-src="/meditation/get-sound-image/{[{sound.id}]}"/>
+              
+              <h3>{[{sound.name}]}</h3>
+              <a href="/meditation/user-profile/{[{sound.user.id}]}" ng-click="setVisitUser(sound.user)">{[{sound.user.username}]}</a>
+            </div>
+          </div>
+
+          <button id="launch-btn" ng-click="playSound(currentSound)" data-dismiss="modal" >Launch</button>
+        </div>
+
+      </div>
+    </div>
+  </div>
+
+  <div class="container scene">
+    <!-- Video scene -->
+    <div ng-show="currentSound.url!=''">
+      <div id="youtube-video"></div>
+    </div>
+
+    <video ng-hide="currentSound.url!=''" autoplay loop>
+        <source id="user-video">
+    </video>
+
+    <div id="scene-canvas" ></div>
+  </div>
+
+  <!-- Album Side Bar Division -->
+  <div album-sidebar></div>
+
+</div>
+
+{% include "meditation/popup-create-album.html" %}
+
+{% endblock %}

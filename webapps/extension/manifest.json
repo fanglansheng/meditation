@@ -1,0 +1,16 @@
+{
+  "manifest_version": 2,
+
+  "name": "Meditation",
+  "description": "This extension will create a sound or a music for meditation website",
+  "version": "1.0",
+
+  "browser_action": {
+   "default_icon": "icon.png",
+   "default_popup": "popup.html"
+  },
+  "permissions": [
+   "activeTab",
+   "tabs"
+   ]
+}
