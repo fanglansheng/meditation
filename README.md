@@ -8,4 +8,4 @@ Peoples can experience listening musics in different environment by setting an e
 
 Frameworks: AngularJS, Django, Bootstrap
 
-website link: http://52.3.113.73
+website link: http://54.187.187.117/meditation/
